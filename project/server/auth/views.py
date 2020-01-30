@@ -22,8 +22,10 @@ class RegisterAPI(MethodView):
 
     def post(self):
         # get the post data
+
         post_data = request.get_json(); print(request)
         # check if user already exists
+
         user = User.query.filter_by(email=post_data.get('email')).first()
         if not user:
             try:
@@ -57,12 +59,43 @@ class RegisterAPI(MethodView):
             return make_response(jsonify(responseObject)), 202
 
 
+class AccountsReader(MethodView):
+    def get(self):
+
+        list_of_accounts = User.query.all()
+
+        list_of_emails = []
+
+        responseObject= {                
+            
+
+        }
+
+        i = 0
+        for account in list_of_accounts:
+            
+            indicator = "account " + str(i) + ":"
+
+            responseObject[indicator] = account.email
+
+            i += 1
+
+        return make_response(jsonify(responseObject)), 201
+            
+
 # define the API resources
 registration_view = RegisterAPI.as_view('register_api')
+accounts_api = AccountsReader.as_view('accounts_reader')
 
 # add Rules for API Endpoints
 auth_blueprint.add_url_rule(
     '/auth/register',
     view_func=registration_view,
     methods=['POST', 'GET']
+)
+
+auth_blueprint.add_url_rule(
+    '/users/index',
+    view_func=accounts_api,
+    methods=['GET']
 )
